@@ -7,6 +7,7 @@ export default function AdminBooksPage() {
   const [books, setBooks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterLangue, setFilterLangue] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
@@ -80,13 +81,17 @@ export default function AdminBooksPage() {
 
   const toggleActive = async (id) => {
     setIsProcessing(true);
+    setError('');
+    setSuccess('');
     try {
       await booksService.toggleActive(id);
-      setBooks(
-        books.map((book) =>
-          book.id === id ? { ...book, active: !book.active } : book
-        )
+      const updatedBooks = books.map((book) =>
+        book.id === id ? { ...book, active: !book.active } : book
       );
+      setBooks(updatedBooks);
+      const book = updatedBooks.find(b => b.id === id);
+      setSuccess(book.active ? 'Livre activé avec succès' : 'Livre désactivé avec succès');
+      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError(
         err instanceof ApiError ? err.message : 'Erreur lors de la mise à jour'
@@ -98,13 +103,17 @@ export default function AdminBooksPage() {
 
   const toggleFeatured = async (id) => {
     setIsProcessing(true);
+    setError('');
+    setSuccess('');
     try {
       await booksService.toggleFeatured(id);
-      setBooks(
-        books.map((book) =>
-          book.id === id ? { ...book, featured: !book.featured } : book
-        )
+      const updatedBooks = books.map((book) =>
+        book.id === id ? { ...book, featured: !book.featured } : book
       );
+      setBooks(updatedBooks);
+      const book = updatedBooks.find(b => b.id === id);
+      setSuccess(book.featured ? 'Livre mis en vedette' : 'Livre retiré de la vedette');
+      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError(
         err instanceof ApiError ? err.message : 'Erreur lors de la mise à jour'
@@ -118,13 +127,26 @@ export default function AdminBooksPage() {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce livre?')) return;
 
     setIsProcessing(true);
+    setError('');
+    setSuccess('');
     try {
       await booksService.deleteBook(id);
       setBooks(books.filter((book) => book.id !== id));
+      setSuccess('Livre supprimé avec succès');
+      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
-      setError(
-        err instanceof ApiError ? err.message : 'Erreur lors de la suppression'
-      );
+      let errorMessage = 'Erreur lors de la suppression';
+      
+      if (err instanceof ApiError) {
+        // Gestion du code 400 personnalisé
+        if (err.status === 400) {
+          errorMessage = 'Le livre a toujours une commande en cours';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsProcessing(false);
     }
@@ -147,6 +169,12 @@ export default function AdminBooksPage() {
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-8 text-red-700">
           {error}
+        </div>
+      )}
+
+      {success && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-8 text-green-700">
+          {success}
         </div>
       )}
 
