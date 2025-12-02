@@ -5,7 +5,7 @@
 
 import axios from 'axios';
 
-const API_BASE_URL =  'http://192.168.102.238:8000/api/v1';
+const API_BASE_URL =  'http://192.168.238.238:8000/api/v1';
 const AUTH_BASE_URL = `${API_BASE_URL}/auth`;
 
 // Événement personnalisé pour la redirection sur 401

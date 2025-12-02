@@ -31,7 +31,7 @@ export default function PasswordResetRequestPage() {
   };
 
   return (
-    <MainLayout hideNavbar>
+    <MainLayout hideNavbar hideFooter>
       <div className="max-w-md mx-auto">
         <div className="bg-white border border-gray-200 rounded-lg p-8">
           <h1 className="text-3xl font-bold mb-2 text-center text-gray-900">
