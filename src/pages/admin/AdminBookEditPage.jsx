@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import BookVideosManager from '../../components/admin/BookVideosManager';
 import { booksService, ApiError } from '../../services';
 import { Trash2, Plus, X } from 'lucide-react';
 
@@ -38,21 +39,13 @@ export default function AdminBookEditPage() {
 
     // Images et vidéos
     const [images, setImages] = useState([]);
-    const [videos, setVideos] = useState([]);
     const [selectedImageFile, setSelectedImageFile] = useState(null);
     const [imageFormData, setImageFormData] = useState({
         type: 'cover_front',
         alt_text: '',
         is_main_cover: false,
     });
-    const [videoFormData, setVideoFormData] = useState({
-        video_url: '',
-        title: '',
-        description: '',
-        order: 0,
-    });
     const [isAddingImage, setIsAddingImage] = useState(false);
-    const [isAddingVideo, setIsAddingVideo] = useState(false);
     
     // Modal de confirmation de suppression
     const [deleteModal, setDeleteModal] = useState({
@@ -77,11 +70,10 @@ export default function AdminBookEditPage() {
         }
     }, [id]);
 
-    // Charger les images et vidéos quand l'ID du livre est disponible
+    // Charger les images quand l'ID du livre est disponible
     useEffect(() => {
         if (bookCreatedId) {
             fetchImages();
-            fetchVideos();
         }
     }, [bookCreatedId]);
 
@@ -91,15 +83,6 @@ export default function AdminBookEditPage() {
             setImages(Array.isArray(data) ? data : data.results || []);
         } catch (err) {
             console.error('Erreur lors du chargement des images:', err);
-        }
-    };
-
-    const fetchVideos = async () => {
-        try {
-            const data = await booksService.getBookVideos(parseInt(bookCreatedId));
-            setVideos(Array.isArray(data) ? data : data.results || []);
-        } catch (err) {
-            console.error('Erreur lors du chargement des vidéos:', err);
         }
     };
 
@@ -219,51 +202,6 @@ export default function AdminBookEditPage() {
         e.preventDefault();
         e.stopPropagation();
         openDeleteModal('image', imageId);
-    };
-
-    const handleAddVideo = async () => {
-        if (!videoFormData.video_url || !videoFormData.title) {
-            setError('L\'URL et le titre sont requis');
-            return;
-        }
-
-        setIsAddingVideo(true);
-        try {
-            await booksService.addBookVideo(parseInt(bookCreatedId), videoFormData);
-            setVideoFormData({
-                video_url: '',
-                title: '',
-                description: '',
-                order: 0,
-            });
-            await fetchVideos();
-        } catch (err) {
-            setError(err instanceof ApiError ? err.message : 'Erreur lors de l\'ajout de la vidéo');
-        } finally {
-            setIsAddingVideo(false);
-        }
-    };
-
-    const handleDeleteVideo = (e, videoId) => {
-        e.preventDefault();
-        e.stopPropagation();
-        openDeleteModal('video', videoId);
-    };
-
-    const getVideoEmbedUrl = (url) => {
-        // YouTube: https://www.youtube.com/watch?v=ID ou https://youtu.be/ID
-        const youtubeMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);
-        if (youtubeMatch) {
-            return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
-        }
-
-        // Vimeo: https://vimeo.com/ID
-        const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
-        if (vimeoMatch) {
-            return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
-        }
-
-        return null;
     };
 
     const handleSubmit = async (e) => {
@@ -676,113 +614,12 @@ export default function AdminBookEditPage() {
                             )}
                         </div>
 
-                        {/* Videos Section */}
-                        <div className="mb-8">
-                            <h2 className="text-2xl font-bold mb-4 text-gray-900">Vidéos</h2>
 
-                        {/* Add Video Form */}
-                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
-                            <div className="mb-4">
-                                <label className="block text-sm font-semibold text-gray-900 mb-2">
-                                    URL Vidéo (YouTube/Vimeo) *
-                                </label>
-                                <input
-                                    type="url"
-                                    value={videoFormData.video_url}
-                                    onChange={(e) => setVideoFormData({ ...videoFormData, video_url: e.target.value })}
-                                    placeholder="https://www.youtube.com/watch?v=..."
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg"
-                                />
-                            </div>
-                            
-                            <div className="mb-4">
-                                <label className="block text-sm font-semibold text-gray-900 mb-2">
-                                    Titre *
-                                </label>
-                                <input
-                                    type="text"
-                                    value={videoFormData.title}
-                                    onChange={(e) => setVideoFormData({ ...videoFormData, title: e.target.value })}
-                                    placeholder="Titre de la vidéo"
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg"
-                                />
-                            </div>
-                            
-                            <div className="mb-4">
-                                <label className="block text-sm font-semibold text-gray-900 mb-2">
-                                    Description
-                                </label>
-                                <textarea
-                                    value={videoFormData.description}
-                                    onChange={(e) => setVideoFormData({ ...videoFormData, description: e.target.value })}
-                                    placeholder="Description de la vidéo"
-                                    rows={3}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg"
-                                ></textarea>
-                            </div>
-                            
-                            <button
-                                type="button"
-                                onClick={handleAddVideo}
-                                disabled={isAddingVideo || !videoFormData.video_url || !videoFormData.title}
-                                className="flex items-center gap-2 bg-primary text-white py-2 px-4 rounded-lg font-semibold hover:bg-secondary transition disabled:bg-gray-400"
-                            >
-                                <Plus size={18} />
-                                {isAddingVideo ? 'Ajout en cours...' : 'Ajouter une vidéo'}
-                            </button>
-                        </div>
 
-                        {/* Videos List */}
-                        {videos.length > 0 && (
-                            <div className="space-y-4">
-                                {videos.map((video) => {
-                                    const embedUrl = getVideoEmbedUrl(video.video_url);
-                                    return (
-                                        <div key={video.id} className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden">
-                                            {embedUrl && (
-                                                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                                                    <iframe
-                                                        src={embedUrl}
-                                                        className="absolute top-0 left-0 w-full h-full"
-                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                                        allowFullScreen
-                                                        title={video.title}
-                                                    ></iframe>
-                                                </div>
-                                            )}
-                                            <div className="p-4">
-                                                <div className="flex justify-between items-start">
-                                                    <div className="flex-1">
-                                                        <h3 className="font-semibold text-gray-900 mb-1">{video.title}</h3>
-                                                        {video.description && (
-                                                            <p className="text-sm text-gray-600 mb-2">{video.description}</p>
-                                                        )}
-                                                        <a
-                                                            href={video.video_url}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="text-xs text-primary hover:underline break-all"
-                                                        >
-                                                            {video.video_url}
-                                                        </a>
-                                                    </div>
-                                                    <button
-                                                        type="button"
-                                                        onClick={(e) => handleDeleteVideo(e, video.id)}
-                                                        className="ml-4 text-red-600 hover:bg-red-100 p-2 rounded transition flex-shrink-0"
-                                                    >
-                                                        <Trash2 size={18} />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
-                            {videos.length === 0 && (
-                                <p className="text-gray-500 text-sm">Aucune vidéo ajoutée</p>
-                            )}
+                        {/* Videos Upload (File Upload) Section */}
+                        <div className="mb-8 border-t border-gray-200 pt-8">
+                            <h2 className="text-2xl font-bold mb-4 text-gray-900">Vidéos (Upload de fichiers)</h2>
+                            <BookVideosManager bookId={parseInt(bookCreatedId)} />
                         </div>
                     </>
                 )}
