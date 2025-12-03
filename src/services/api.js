@@ -26,7 +26,7 @@ class ApiClient {
     // Configuration d'axios
     this.axiosInstance = axios.create({
       baseURL: this.baseURL,
-      timeout: 10000,
+      timeout: 500000,
     });
   }
 
