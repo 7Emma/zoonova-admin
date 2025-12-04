@@ -194,15 +194,17 @@ export default function AdminOrdersPage() {
             <table className="w-full min-w-max">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="text-left px-2 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-xs sm:text-sm">N° Commande</th>
-                  <th className="text-left px-2 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-xs sm:text-sm">Client</th>
-                  <th className="text-left px-2 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-xs sm:text-sm">Adresse</th>
-                  <th className="text-center px-2 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-xs sm:text-sm hidden sm:table-cell">Articles</th>
-                  <th className="text-right px-2 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-xs sm:text-sm">Total</th>
-                  <th className="text-center px-2 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-xs sm:text-sm">Date</th>
-                  <th className="text-center px-2 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-xs sm:text-sm">Statut</th>
-                  <th className="text-center sm:text-right px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm">Actions</th>
-                </tr>
+                   <th className="text-left px-2 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-xs sm:text-sm">N° Commande</th>
+                   <th className="text-left px-2 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-xs sm:text-sm">Client</th>
+                   <th className="text-left px-2 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-xs sm:text-sm">Adresse</th>
+                   <th className="text-center px-2 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-xs sm:text-sm hidden sm:table-cell">Articles</th>
+                   <th className="text-right px-2 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-xs sm:text-sm hidden sm:table-cell">Sous-total</th>
+                   <th className="text-right px-2 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-xs sm:text-sm hidden sm:table-cell">Frais</th>
+                   <th className="text-right px-2 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-xs sm:text-sm">Total</th>
+                   <th className="text-center px-2 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-xs sm:text-sm">Date</th>
+                   <th className="text-center px-2 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-xs sm:text-sm">Statut</th>
+                   <th className="text-center sm:text-right px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm">Actions</th>
+                 </tr>
               </thead>
               <tbody>
                 {orders.length === 0 ? (
@@ -220,8 +222,10 @@ export default function AdminOrdersPage() {
                         <div className="text-xs text-gray-600 hidden sm:block">{order.email}</div>
                        </td>
                        <td className="px-2 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-600 max-w-xs sm:max-w-sm truncate">{order.full_address}</td>
-                       <td className="text-center px-2 sm:px-6 py-3 sm:py-4 text-gray-900 text-xs sm:text-sm hidden sm:table-cell">{order.items_count || 0}</td>
-                      <td className="text-right px-2 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-xs sm:text-sm">{order.total_euros}€</td>
+                        <td className="text-center px-2 sm:px-6 py-3 sm:py-4 text-gray-900 text-xs sm:text-sm hidden sm:table-cell">{order.items_count || 0}</td>
+                       <td className="text-right px-2 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-xs sm:text-sm hidden sm:table-cell">{order.subtotal_euros}€</td>
+                       <td className="text-right px-2 sm:px-6 py-3 sm:py-4 text-gray-900 text-xs sm:text-sm hidden sm:table-cell">{order.shipping_cost_euros}€</td>
+                       <td className="text-right px-2 sm:px-6 py-3 sm:py-4 font-semibold text-gray-900 text-xs sm:text-sm">{order.total_euros}€</td>
                       <td className="text-center px-2 sm:px-6 py-3 sm:py-4 text-gray-600 text-xs sm:text-sm">{formatDate(order.created_at)}</td>
                       <td className="text-center px-2 sm:px-6 py-3 sm:py-4">{getStatusBadge(order.status)}</td>
                       <td className="text-center sm:text-right px-2 sm:px-6 py-3 sm:py-4 space-x-1 sm:space-x-2 text-xs sm:text-sm">
