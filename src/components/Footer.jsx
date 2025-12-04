@@ -133,7 +133,7 @@ export default function Footer() {
         {/* Conception */}
         <div className="border-t border-gray-800 pt-8 mb-8">
           <div className="text-center text-gray-400 text-sm">
-            <p className="mb-2">Conception: <a href="mailto:limay.amboka@gmail.com" className="hover:text-primary transition">limay.amboka@gmail.com</a></p>
+            <p className="mb-2">Conception: <a href="mailto:limay.amboka@gmail.com" className="hover:text-primary transition">@ManuCoder</a></p>
           </div>
         </div>
 
