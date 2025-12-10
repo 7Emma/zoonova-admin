@@ -10,6 +10,7 @@ export default function AdminOrdersPage() {
   const [filters, setFilters] = useState({
     search: '',
     status: '',
+    payment_status: 'paid', // Par défaut, afficher seulement les commandes payées
     date: '',
     page: 1
   });
@@ -22,7 +23,7 @@ export default function AdminOrdersPage() {
 
   useEffect(() => {
     fetchOrders();
-  }, [filters.page, filters.status, filters.date]);
+  }, [filters.page, filters.status, filters.payment_status, filters.date]);
 
   const fetchOrders = async () => {
     try {
@@ -35,6 +36,7 @@ export default function AdminOrdersPage() {
       };
 
       if (filters.status) options.status = filters.status;
+      if (filters.payment_status) options.payment_status = filters.payment_status;
       if (filters.date) options.start_date = filters.date;
       if (filters.search) options.search = filters.search;
 
@@ -143,32 +145,41 @@ export default function AdminOrdersPage() {
       <h1 className="text-2xl sm:text-4xl font-bold mb-8 text-gray-900">Gestion des commandes</h1>
 
       <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 mb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
-          <input
-            type="text"
-            placeholder="Rechercher un client..."
-            value={filters.search}
-            onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <select 
-            value={filters.status || 'all'}
-            onChange={handleStatusChange}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">Tous les statuts</option>
-            <option value="pending">En attente</option>
-            <option value="processing">En traitement</option>
-            <option value="shipped">Expédié</option>
-            <option value="delivered">Livré</option>
-          </select>
-          <input
-            type="date"
-            value={filters.date}
-            onChange={handleDateChange}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+         <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 sm:gap-4">
+           <input
+             type="text"
+             placeholder="Rechercher un client..."
+             value={filters.search}
+             onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+           />
+           <select 
+             value={filters.status || 'all'}
+             onChange={handleStatusChange}
+             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+           >
+             <option value="all">Tous les statuts</option>
+             <option value="pending">En attente</option>
+             <option value="processing">En traitement</option>
+             <option value="shipped">Expédié</option>
+             <option value="delivered">Livré</option>
+           </select>
+           <select 
+             value={filters.payment_status}
+             onChange={(e) => setFilters(prev => ({ ...prev, payment_status: e.target.value, page: 1 }))}
+             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+           >
+             <option value="">Tous les paiements</option>
+             <option value="paid">Payée</option>
+             <option value="unpaid">Non payée</option>
+           </select>
+           <input
+             type="date"
+             value={filters.date}
+             onChange={handleDateChange}
+             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+           />
+         </div>
         <button
           onClick={handleSearch}
           className="mt-4 px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm sm:text-base"
